@@ -1,0 +1,31 @@
+name: evoman
+channels:
+  - cogsci
+  - http://conda.anaconda.org/gurobi
+  - Lyken
+  - anaconda
+  - ak_93
+  - conda-forge
+  - pytorch
+  - defaults
+dependencies:
+  - blas=1.0=mkl
+  - ca-certificates=2020.7.22=0
+  - certifi=2019.11.28=py27_0
+  - icc_rt=2019.0.0=h0cc432a_1
+  - intel-openmp=2020.2=254
+  - mkl=2019.4=245
+  - numpy=1.14.2=py27h0bb1d87_0
+  - openssl=1.1.1e=h0c8e037_0
+  - pip=19.3.1=py27_0
+  - pygame=1.9.2a0=py27_0
+  - python=2.7.18=hfb89ab9_0
+  - setuptools=23.0.0=py27_0
+  - six=1.15.0=py_0
+  - sqlite=3.30.1=h0c8e037_0
+  - vc=9=h7299396_1
+  - vs2008_runtime=9.00.30729.1=hfaea7d5_1
+  - vs2015_runtime=14.16.27012=hf0eaf9b_3
+  - wheel=0.35.1=py_0
+prefix: C:\Users\Christoph\Anaconda3\envs\evoman
+
