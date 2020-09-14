@@ -1,0 +1,7 @@
+{
+  "fitness": "default",
+  "mate_select": "dummy",
+  "mate": "dummy",
+  "mutate": "dummy",
+  "survive_select": "dummy"
+}
