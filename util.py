@@ -38,6 +38,6 @@ def select_selection(fct_name):
     if fct_name == 'dummy':
         return dummy_survivors
     elif fct_name == 'dummy_pairs':
-        return select_strongest_pairs
+        return select_k_strongest_pairs
     else:
         raise RuntimeError("Unknown type of selection encountered! Please check your config.")

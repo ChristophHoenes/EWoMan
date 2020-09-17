@@ -1,21 +1,20 @@
 import numpy as np
 
 
-def select_strongest_pairs(fitness, num_matings=10):
-    sorted_fit = np.argsort(fitness)
-    pairs = sorted_fit[:2*num_matings].reshape([num_matings, 2])
-    return list(map(tuple, pairs))
+#def select_strongest_pairs(fitness, num_matings=5):
+#    sorted_fit = np.argsort(fitness)
+#    pairs = sorted_fit[:2*num_matings].reshape([num_matings, 2])
+#    return list(map(tuple, pairs))
+
+def select_k_strongest_pairs(population, k=9):
+    fitness = [p.fitness.values[0] for p in population]
+    sorted_idxs = [x for x, y in sorted(enumerate(fitness), key=lambda tup: tup[1])]
+    top_k = sorted_idxs[:k]
+    return [population[top_k[np.random.choice(len(top_k))]] for i in range(2*len(population))]
 
 
-def dummy_survivors(population, offspring, die_prob=0.05):
-    pop_size = population.shape[0]
-    survivors = np.ones(size=pop_size, dtype=bool)
-    pop_dead = np.random.choice(pop_size, size=(pop_size*die_prob))
-    survivors[pop_dead] = False
-
-    kid_size = offspring.shape[0]
-    kid_survivors = np.ones(size=kid_size, dtype=bool)
-    kid_dead = np.random.choice(kid_size, size=(kid_size*die_prob**2))
-    kid_survivors[kid_dead] = False
-
-    return np.vstack([population[survivors], offspring[kid_survivors]])
+def dummy_survivors(population, k=3):
+    fitness = [p.fitness.values[0] for p in population]
+    sorted_idxs = [x for x, y in sorted(enumerate(fitness), key=lambda tup: tup[1])]
+    top_k = sorted_idxs[:k]
+    return [population[i] for i in top_k]

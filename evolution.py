@@ -21,10 +21,21 @@ from representations import select_representation
 
 def start_evolution(args, config):
 
+    # define deap individuals to maximize fitness value
     creator.create("FitnessMax", base.Fitness, weights=(1.0,))
     creator.create("Individual", list, fitness=creator.FitnessMax)
 
+    # setup deap toolbox and statistics
     toolbox = base.Toolbox()
+    top5 = tools.HallOfFame(5)
+    stats = tools.Statistics(lambda x: x.fitness.values)
+    stats.register("mean", np.mean)
+    stats.register("std", np.std)
+    stats.register("max", np.max)
+    stats.register("min", np.min)
+    logs = [tools.Logbook()]
+    logs[-1].header = "generation", "fit_evaluations", "mean", "std", "max", "min"
+    fit_evaluations = 0
 
     # register desired evolution components
     process_config(config, toolbox)
@@ -58,25 +69,38 @@ def start_evolution(args, config):
     population = rep.create_population(args.pop_size)
 
     # loop through training iterations
-    for i in range(args.num_iter):
+    for i in range(args.num_iter+1):
 
         # test fitness of population
         fitness = list(map(lambda p: toolbox.evaluate_fitness(p, env), population))
+        fit_evaluations += len(population)
+
         # assign fitness to corresponding individuals
         for ind, fit in zip(population, fitness):
-            ind.fitness.values = fit
+            ind.fitness.values = (fit,)
+
+        # record statistics and save intermediate results
+        top5.update(population)
+        record = stats.compile(population)
+        logs[-1].record(generation=i, fit_evaluations=fit_evaluations, **record)
+        # print progress
+        print(logs[-1].stream)
+        # stop last iteration after evaluation of final population
+        if i == args.num_iter:
+            break
+
+        # Evolution components
         # mating selection
-        partner_ids = toolbox.select_mating_partners(fitness)
+        partners = toolbox.select_mating_partners(population)
         # mating mechanism (creating offspring from selection) and random mutation
-        offspring = toolbox.mate(population, partner_ids)
+        offspring = toolbox.mate(partners)
         # random mutations of existing individuals?? (optional)
         population = toolbox.mutate_parents(population)
         offspring = toolbox.mutate_offspring(offspring)
         # survivor selection (define population of next iteration; which individuals are kept)
-        population = toolbox.select_survivors(population, offspring)
-
-        # TODO (see comment below)
-        # record statistics and save intermediate results
+        population = toolbox.select_survivors(population)
+        # next generation consists of the survivers of the previous and the offspring
+        population = population + offspring
 
 
 if __name__ == "__main__":
@@ -93,7 +117,7 @@ if __name__ == "__main__":
                         help='Whether or not to randomly initialize location of enemy.')
     parser.add_argument('--contacthurt', default="player", type=str, choices=["player", "enemy"],
                         help='Who is hurt by contact with the opponent.')
-    parser.add_argument('--pop_size', default=100, type=int,
+    parser.add_argument('--pop_size', default=10, type=int,
                         help='Population size (initial number of individuals).')
     parser.add_argument('--config', default="default_config.json", type=str,
                         help='Configuration file that specifies some parameters.')

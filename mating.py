@@ -1,10 +1,9 @@
-import numpy as np
-
-
-def average_parents(population, partner_ids):
+def average_parents(partners, ratio=0.5):
     children = []
-    for pair in partner_ids:
-        kid = 0.5 * population[pair[0]] + 0.5 * population[pair[1]]
-        children.append(kid)
-    return np.stack(children)
+    for parent1, parent2 in zip(partners[::2], partners[1::2]):
+        for i in range(len(parent1)):
+            parent1[i] *= ratio
+            parent1[i] += (1-ratio) * parent2[i]
+        children.append(parent1)
+    return children
 
