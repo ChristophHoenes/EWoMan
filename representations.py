@@ -4,6 +4,8 @@ import os
 import sys
 from abc import ABC, abstractmethod
 
+from deap import creator, base, tools, algorithms
+
 sys.path.insert(0, './evoman_framework')
 from demo_controller import player_controller
 
@@ -11,9 +13,10 @@ from demo_controller import player_controller
 NUM_SENSORS = 20
 NUM_ACTIONS = 5
 
-def select_representation(args):
+
+def select_representation(args, toolbox):
     if args.representation == "Neurons":
-        return NeuronRep(args.num_neurons)
+        return NeuronRep(args.num_neurons, toolbox=toolbox)
     else:
         raise RuntimeError('Unknown representation type encountered!')
 
@@ -36,9 +39,13 @@ class Representation(ABC):
 
 class NeuronRep(Representation):
 
-    def __init__(self, num_neurons):
+    def __init__(self, num_neurons, toolbox=None):
         self.config = {"num_neurons": num_neurons,
                        "num_params": (NUM_SENSORS + 1) * num_neurons + (num_neurons + 1) * NUM_ACTIONS}
+        toolbox.register("attr_float", np.random.uniform, -1, 1)
+        toolbox.register("individual", tools.initRepeat, creator.Individual, toolbox.attr_float, n=self.config["num_params"])
+        toolbox.register("population", tools.initRepeat, list, toolbox.individual)
+        self.toolbox = toolbox
 
     def get_controller(self):
         return player_controller(self.config['num_neurons'])
@@ -46,4 +53,4 @@ class NeuronRep(Representation):
     def create_population(self, population_size):
         # TODO maybe change to uniform distribution
         # TODO check number of parameters/neurons
-        return np.random.normal(loc=0, scale=1, size=(population_size, self.config['num_params']))
+        return self.toolbox.population(n=population_size)

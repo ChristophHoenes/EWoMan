@@ -1,9 +1,11 @@
 # standard library imports
 import argparse
 import json
+import numpy as np
 import sys
 import os
 # third party imports
+from deap import creator, base, tools, algorithms
 
 # local imports
 # change directory and add evoman to path to be able to load framework without errors
@@ -13,17 +15,22 @@ from environment import Environment
 # change working directory back to root
 os.chdir('../')
 
-from fitness import evaluate_fitness
-from mating import mate, select_mating_partners
-from mutation import mutate
+from util import process_config
 from representations import select_representation
-from survival import select_survivors
 
 
 def start_evolution(args, config):
 
+    creator.create("FitnessMax", base.Fitness, weights=(1.0,))
+    creator.create("Individual", list, fitness=creator.FitnessMax)
+
+    toolbox = base.Toolbox()
+
+    # register desired evolution components
+    process_config(config, toolbox)
+
     # pick problem representation
-    rep = select_representation(args)
+    rep = select_representation(args, toolbox)
     # initialize controller that handles the representation
     controller = rep.get_controller()
 
@@ -54,16 +61,19 @@ def start_evolution(args, config):
     for i in range(args.num_iter):
 
         # test fitness of population
-        fitness = list(map(lambda p: evaluate_fitness(p, env, typ=config["fitness"]), population))
+        fitness = list(map(lambda p: toolbox.evaluate_fitness(p, env), population))
+        # assign fitness to corresponding individuals
+        for ind, fit in zip(population, fitness):
+            ind.fitness.values = fit
         # mating selection
-        partner_ids = select_mating_partners(fitness, typ=config["mate_select"])
+        partner_ids = toolbox.select_mating_partners(fitness)
         # mating mechanism (creating offspring from selection) and random mutation
-        offspring = mate(population, partner_ids, typ=config["mate"])
+        offspring = toolbox.mate(population, partner_ids)
         # random mutations of existing individuals?? (optional)
-        population = mutate(population, typ=config["mutate"])
-        offspring = mutate(offspring, typ=config["mutate"])
+        population = toolbox.mutate_parents(population)
+        offspring = toolbox.mutate_offspring(offspring)
         # survivor selection (define population of next iteration; which individuals are kept)
-        population = select_survivors(population, offspring, typ=config["survive_select"])
+        population = toolbox.select_survivors(population, offspring)
 
         # TODO (see comment below)
         # record statistics and save intermediate results

@@ -1,7 +1,8 @@
 {
   "fitness": "default",
-  "mate_select": "dummy",
+  "mate_select": "dummy_pairs",
   "mate": "dummy",
-  "mutate": "dummy",
+  "mutate_offspring": "dummy",
+  "mutate_parents": "dummy",
   "survive_select": "dummy"
 }
