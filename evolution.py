@@ -113,13 +113,13 @@ if __name__ == "__main__":
                         help='Number of neurons used for the population.')
     parser.add_argument('--enemies', default=[2], nargs='+', type=int,
                         help='ID(s) of the enemy to specialize.')
-    parser.add_argument('--level', default=1, type=int,
+    parser.add_argument('--level', default=2, type=int,
                         help='Difficulty of the game.')
     parser.add_argument('--random_loc', default="no", type=str, choices=["yes", "no"],
                         help='Whether or not to randomly initialize location of enemy.')
     parser.add_argument('--contacthurt', default="player", type=str, choices=["player", "enemy"],
                         help='Who is hurt by contact with the opponent.')
-    parser.add_argument('--pop_size', default=10, type=int,
+    parser.add_argument('--pop_size', default=100, type=int,
                         help='Population size (initial number of individuals).')
     parser.add_argument('--config', default="default_config.json", type=str,
                         help='Configuration file that specifies some parameters.')
