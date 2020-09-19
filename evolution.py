@@ -91,16 +91,16 @@ def start_evolution(args, config):
 
         # Evolution components
         # mating selection
-        partners = toolbox.select_mating_partners(population)
+        partners = toolbox.select_mating_partners(population, **config["mate_select_args"])
         # mating mechanism (creating offspring from selection) and random mutation
         # clone parents first
         parent_clones = [tuple(toolbox.clone(ind) for ind in tup) for tup in partners]
-        offspring = toolbox.mate(parent_clones)
+        offspring = toolbox.mate(parent_clones, **config["mate_args"])
         # random mutations of existing individuals?? (optional)
-        population = toolbox.mutate_parents(population)
-        offspring = toolbox.mutate_offspring(offspring)
+        population = toolbox.mutate_parents(population, **config["mut_pop_args"])
+        offspring = toolbox.mutate_offspring(offspring, **config["mut_off_args"])
         # survivor selection (define population of next iteration; which individuals are kept)
-        population = toolbox.select_survivors(population)
+        population = toolbox.select_survivors(population, **config["survive_args"])
         # next generation consists of the survivers of the previous and the offspring
         population = population + offspring
 
