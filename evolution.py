@@ -93,7 +93,9 @@ def start_evolution(args, config):
         # mating selection
         partners = toolbox.select_mating_partners(population)
         # mating mechanism (creating offspring from selection) and random mutation
-        offspring = toolbox.mate(partners)
+        # clone parents first
+        parent_clones = [tuple(toolbox.clone(ind) for ind in tup) for tup in partners]
+        offspring = toolbox.mate(parent_clones)
         # random mutations of existing individuals?? (optional)
         population = toolbox.mutate_parents(population)
         offspring = toolbox.mutate_offspring(offspring)

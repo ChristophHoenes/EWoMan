@@ -1,4 +1,5 @@
 import numpy as np
+from deap import tools
 
 
 def gaussian_dummy_mutate(population, mutate_prob=0.1):
@@ -10,3 +11,7 @@ def gaussian_dummy_mutate(population, mutate_prob=0.1):
             mutate_individual[mutate_gene] += np.random.normal(loc=0, scale=0.5)
     return population
 
+
+def deap_shuffle_mutation(population, ind_prob=0.2, mprob=0.1):
+    mutant_selection = np.random.choice(2, size=len(population), p=[1-ind_prob, ind_prob])
+    return [tools.mutShuffleIndexes(ind, mprob)[0] if mutant_selection[i] else ind for i, ind in enumerate(population)]

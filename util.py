@@ -23,6 +23,8 @@ def select_fitness(fct_name):
 def select_mating(fct_name):
     if fct_name == 'dummy':
         return average_parents
+    elif fct_name == 'deap_xover_blend':
+        return deap_xover_blend
     else:
         raise RuntimeError("Unknown type of mating function encountered! Please check your config.")
 
@@ -30,6 +32,8 @@ def select_mating(fct_name):
 def select_mutation(fct_name):
     if fct_name == 'dummy':
         return gaussian_dummy_mutate
+    elif fct_name == 'deap_mutate_shuffle':
+        return deap_shuffle_mutation
     else:
         raise RuntimeError("Unknown type of mutation function encountered! Please check your config.")
 
@@ -39,5 +43,9 @@ def select_selection(fct_name):
         return dummy_survivors
     elif fct_name == 'dummy_pairs':
         return select_k_strongest_pairs
+    elif fct_name == 'deap_tournament':
+        return deap_tournament
+    elif fct_name == 'deap_tournament_pairs':
+        return deap_tournament_pairs
     else:
         raise RuntimeError("Unknown type of selection encountered! Please check your config.")

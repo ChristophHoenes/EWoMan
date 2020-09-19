@@ -1,0 +1,8 @@
+{
+  "fitness": "default",
+  "mate_select": "deap_tournament_pairs",
+  "mate": "deap_xover_blend",
+  "mutate_offspring": "deap_mutate_shuffle",
+  "mutate_parents": "deap_mutate_shuffle",
+  "survive_select": "deap_tournament"
+}
