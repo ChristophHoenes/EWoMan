@@ -123,10 +123,15 @@ if __name__ == "__main__":
                         help='Population size (initial number of individuals).')
     parser.add_argument('--config', default="default_config.json", type=str,
                         help='Configuration file that specifies some parameters.')
+    parser.add_argument('--seed', default=111, type=int,
+                        help='Seed for numpy random functions.')
     parser.add_argument('--representation', default="Neurons", type=str, choices=["Neurons"],
                         help='Type of problem representation.')
 
     args = parser.parse_args()
+
+    # set seed
+    np.random.seed(args.seed)
 
     # load config from file
     with open('configs/{}'.format(args.config)) as c:
