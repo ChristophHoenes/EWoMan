@@ -1,9 +1,11 @@
 # standard library imports
 import argparse
 import json
+import numpy as np
 import sys
 import os
 # third party imports
+from deap import creator, base, tools, algorithms
 
 # local imports
 # change directory and add evoman to path to be able to load framework without errors
@@ -13,17 +15,33 @@ from environment import Environment
 # change working directory back to root
 os.chdir('../')
 
-from fitness import evaluate_fitness
-from mating import mate, select_mating_partners
-from mutation import mutate
+from util import process_config
 from representations import select_representation
-from survival import select_survivors
 
 
 def start_evolution(args, config):
 
+    # define deap individuals to maximize fitness value
+    creator.create("FitnessMax", base.Fitness, weights=(1.0,))
+    creator.create("Individual", list, fitness=creator.FitnessMax)
+
+    # setup deap toolbox and statistics
+    toolbox = base.Toolbox()
+    top5 = tools.HallOfFame(5)
+    stats = tools.Statistics(lambda x: x.fitness.values)
+    stats.register("mean", np.mean)
+    stats.register("std", np.std)
+    stats.register("max", np.max)
+    stats.register("min", np.min)
+    logs = [tools.Logbook()]
+    logs[-1].header = "generation", "fit_evaluations", "mean", "std", "max", "min"
+    fit_evaluations = 0
+
+    # register desired evolution components
+    process_config(config, toolbox)
+
     # pick problem representation
-    rep = select_representation(args)
+    rep = select_representation(args, toolbox)
     # initialize controller that handles the representation
     controller = rep.get_controller()
 
@@ -51,22 +69,40 @@ def start_evolution(args, config):
     population = rep.create_population(args.pop_size)
 
     # loop through training iterations
-    for i in range(args.num_iter):
+    for i in range(args.num_iter+1):
 
         # test fitness of population
-        fitness = list(map(lambda p: evaluate_fitness(p, env, typ=config["fitness"]), population))
-        # mating selection
-        partner_ids = select_mating_partners(fitness, typ=config["mate_select"])
-        # mating mechanism (creating offspring from selection) and random mutation
-        offspring = mate(population, partner_ids, typ=config["mate"])
-        # random mutations of existing individuals?? (optional)
-        population = mutate(population, typ=config["mutate"])
-        offspring = mutate(offspring, typ=config["mutate"])
-        # survivor selection (define population of next iteration; which individuals are kept)
-        population = select_survivors(population, offspring, typ=config["survive_select"])
+        fitness = list(map(lambda p: toolbox.evaluate_fitness(p, env), population))
+        fit_evaluations += len(population)
 
-        # TODO (see comment below)
+        # assign fitness to corresponding individuals
+        for ind, fit in zip(population, fitness):
+            ind.fitness.values = (fit,)
+
         # record statistics and save intermediate results
+        top5.update(population)
+        record = stats.compile(population)
+        logs[-1].record(generation=i, fit_evaluations=fit_evaluations, **record)
+        # print progress
+        print(logs[-1].stream)
+        # stop last iteration after evaluation of final population
+        if i == args.num_iter:
+            break
+
+        # Evolution components
+        # mating selection
+        partners = toolbox.select_mating_partners(population, **config["mate_select_args"])
+        # mating mechanism (creating offspring from selection) and random mutation
+        # clone parents first
+        parent_clones = [tuple(toolbox.clone(ind) for ind in tup) for tup in partners]
+        offspring = toolbox.mate(parent_clones, **config["mate_args"])
+        # random mutations of existing individuals?? (optional)
+        population = toolbox.mutate_parents(population, **config["mut_pop_args"])
+        offspring = toolbox.mutate_offspring(offspring, **config["mut_off_args"])
+        # survivor selection (define population of next iteration; which individuals are kept)
+        population = toolbox.select_survivors(population, **config["survive_args"])
+        # next generation consists of the survivers of the previous and the offspring
+        population = population + offspring
 
 
 if __name__ == "__main__":
@@ -77,7 +113,7 @@ if __name__ == "__main__":
                         help='Number of neurons used for the population.')
     parser.add_argument('--enemies', default=[2], nargs='+', type=int,
                         help='ID(s) of the enemy to specialize.')
-    parser.add_argument('--level', default=1, type=int,
+    parser.add_argument('--level', default=2, type=int,
                         help='Difficulty of the game.')
     parser.add_argument('--random_loc', default="no", type=str, choices=["yes", "no"],
                         help='Whether or not to randomly initialize location of enemy.')
@@ -87,10 +123,15 @@ if __name__ == "__main__":
                         help='Population size (initial number of individuals).')
     parser.add_argument('--config', default="default_config.json", type=str,
                         help='Configuration file that specifies some parameters.')
+    parser.add_argument('--seed', default=111, type=int,
+                        help='Seed for numpy random functions.')
     parser.add_argument('--representation', default="Neurons", type=str, choices=["Neurons"],
                         help='Type of problem representation.')
 
     args = parser.parse_args()
+
+    # set seed
+    np.random.seed(args.seed)
 
     # load config from file
     with open('configs/{}'.format(args.config)) as c:

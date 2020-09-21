@@ -1,15 +1,24 @@
 import numpy as np
+from deap import tools
 
 
-def mutate(population, mutate_prob=0.01, typ='dummy'):
-    if typ == 'dummy':
-        shape = population.shape
-        num_mutate = round(shape[0] * shape[1] * mutate_prob)
-        for m in num_mutate:
-            mutate_individual = np.random.choice(shape[0])
-            mutate_gene = np.random.choice(shape[1])
-            population[mutate_individual][mutate_gene] += np.random.normal(loc=0, scale=0.5)
+def gaussian_dummy_mutate(population, mutate_prob=0.1):
+    num_mutate = round(len(population) * mutate_prob)
+    for m in range(num_mutate):
+        mutate_individual = population[np.random.choice(len(population))]
+        for gene in range(round(len(mutate_individual) * mutate_prob)):
+            mutate_gene = np.random.choice(len(mutate_individual))
+            mutate_individual[mutate_gene] += np.random.normal(loc=0, scale=0.5)
+    return population
 
-        return population
-    else:
-        raise RuntimeError("Unknown type of mutation function encountered! Please check your config.")
+def non_uniform_mutate(population, mutation_step_size=0.05):
+    for individual in population:
+        for gene in individual:
+            gene += np.random.normal(0, mutation_step_size)
+    
+    return population
+
+
+def deap_shuffle_mutation(population, ind_prob=0.2, mprob=0.1):
+    mutant_selection = np.random.choice(2, size=len(population), p=[1-ind_prob, ind_prob])
+    return [tools.mutShuffleIndexes(ind, mprob)[0] if mutant_selection[i] else ind for i, ind in enumerate(population)]
