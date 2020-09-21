@@ -135,10 +135,16 @@ if __name__ == "__main__":
                         help='Seed for numpy random functions.')
     parser.add_argument('--multiprocessing', default=True, type=bool,
                         help='Whether or not to use multiprocessing.')
+    parser.add_argument('--server', default=False, type=bool,
+                        help='Whether or not program is run on a UNIX server.')
     parser.add_argument('--representation', default="Neurons", type=str, choices=["Neurons"],
                         help='Type of problem representation.')
 
     args = parser.parse_args()
+
+    # set dummy video device if run on linux server
+    if args.server:
+        os.environ["SDL_VIDEODRIVER"] = "dummy"
 
     # set seed
     np.random.seed(args.seed)
