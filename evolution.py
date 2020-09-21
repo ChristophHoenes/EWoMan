@@ -3,6 +3,7 @@ import argparse
 import json
 import sys
 import os
+from time import time
 
 # third party imports
 import numpy as np
@@ -153,4 +154,8 @@ if __name__ == "__main__":
     with open('configs/{}'.format(args.config)) as c:
         config = json.loads(c.read())
 
+    start_time = time()
     start_evolution(args, config)
+    end_time = time()
+    print("Finished {} generations with population size of {} in {} minutes".format(args.num_iter, args.pop_size,
+                                                                                    (end_time-start_time)/60))
