@@ -1,11 +1,13 @@
 # standard library imports
 import argparse
 import json
-import numpy as np
 import sys
 import os
+
 # third party imports
+import numpy as np
 from deap import creator, base, tools, algorithms
+from scoop import futures
 
 # local imports
 # change directory and add evoman to path to be able to load framework without errors
@@ -36,6 +38,12 @@ def start_evolution(args, config):
     logs = [tools.Logbook()]
     logs[-1].header = "generation", "fit_evaluations", "mean", "std", "max", "min"
     fit_evaluations = 0
+
+    # check multiprocessing
+    if args.multiprocessing:
+        toolbox.register("map", futures.map)
+    else:
+        toolbox.register("map", map)
 
     # register desired evolution components
     process_config(config, toolbox)
@@ -72,7 +80,7 @@ def start_evolution(args, config):
     for i in range(args.num_iter+1):
 
         # test fitness of population
-        fitness = list(map(lambda p: toolbox.evaluate_fitness(p, env), population))
+        fitness = list(toolbox.map(lambda p: toolbox.evaluate_fitness(p, env), population))
         fit_evaluations += len(population)
 
         # assign fitness to corresponding individuals
@@ -125,6 +133,8 @@ if __name__ == "__main__":
                         help='Configuration file that specifies some parameters.')
     parser.add_argument('--seed', default=111, type=int,
                         help='Seed for numpy random functions.')
+    parser.add_argument('--multiprocessing', default=True, type=bool,
+                        help='Whether or not to use multiprocessing.')
     parser.add_argument('--representation', default="Neurons", type=str, choices=["Neurons"],
                         help='Type of problem representation.')
 
