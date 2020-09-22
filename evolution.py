@@ -116,9 +116,9 @@ def start_evolution(args, config):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Evolution Parameters.')
-    parser.add_argument('--num_iter', default=100,
+    parser.add_argument('--num_iter', default=100, type=int,
                         help='Number of iterations of the evolution (number of generated generations).')
-    parser.add_argument('--num_neurons',  default=10,
+    parser.add_argument('--num_neurons',  default=10, type=int,
                         help='Number of neurons used for the population.')
     parser.add_argument('--enemies', default=[2], nargs='+', type=int,
                         help='ID(s) of the enemy to specialize.')
@@ -134,7 +134,7 @@ if __name__ == "__main__":
                         help='Configuration file that specifies some parameters.')
     parser.add_argument('--seed', default=111, type=int,
                         help='Seed for numpy random functions.')
-    parser.add_argument('--multiprocessing', default=True, type=bool,
+    parser.add_argument('--multiprocessing', default=False, type=bool,
                         help='Whether or not to use multiprocessing.')
     parser.add_argument('--server', default=False, type=bool,
                         help='Whether or not program is run on a UNIX server.')
