@@ -11,6 +11,7 @@ def gaussian_dummy_mutate(population, mutate_prob=0.1):
             mutate_individual[mutate_gene] += np.random.normal(loc=0, scale=0.5)
     return population
 
+
 def non_uniform_mutate(population, mutation_step_size=0.05):
     for individual in population:
         for gene in individual:
@@ -22,3 +23,15 @@ def non_uniform_mutate(population, mutation_step_size=0.05):
 def deap_shuffle_mutation(population, ind_prob=0.2, mprob=0.1):
     mutant_selection = np.random.choice(2, size=len(population), p=[1-ind_prob, ind_prob])
     return [tools.mutShuffleIndexes(ind, mprob)[0] if mutant_selection[i] else ind for i, ind in enumerate(population)]
+
+
+def deap_gaussian_mutation(population, mean=0, std=1, ind_prob=0.2, mprob=0.1):
+    mutant_selection = np.random.choice(2, size=len(population), p=[1-ind_prob, ind_prob])
+    return [tools.mutGaussian(ind, mean, std, mprob)[0]
+            if mutant_selection[i] else ind for i, ind in enumerate(population)]
+
+
+def deap_polynomialbounded_mutation(population, similarity=0.5, low=1, up=-1, ind_prob=0.2, mprob=0.1):
+    mutant_selection = np.random.choice(2, size=len(population), p=[1-ind_prob, ind_prob])
+    return [tools.mutPolynomialBounded(ind, similarity, low, up, mprob)[0]
+            if mutant_selection[i] else ind for i, ind in enumerate(population)]

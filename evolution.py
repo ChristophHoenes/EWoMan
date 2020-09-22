@@ -116,7 +116,7 @@ def start_evolution(args, config):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Evolution Parameters.')
-    parser.add_argument('--num_iter', default=100, type=int,
+    parser.add_argument('--num_iter', default=30, type=int,
                         help='Number of iterations of the evolution (number of generated generations).')
     parser.add_argument('--num_neurons',  default=10, type=int,
                         help='Number of neurons used for the population.')
