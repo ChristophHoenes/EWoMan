@@ -1,11 +1,14 @@
 # standard library imports
 import argparse
 import json
-import numpy as np
 import sys
 import os
+from time import time
+
 # third party imports
+import numpy as np
 from deap import creator, base, tools, algorithms
+from scoop import futures
 
 # local imports
 # change directory and add evoman to path to be able to load framework without errors
@@ -36,6 +39,12 @@ def start_evolution(args, config):
     logs = [tools.Logbook()]
     logs[-1].header = "generation", "fit_evaluations", "mean", "std", "max", "min"
     fit_evaluations = 0
+
+    # check multiprocessing
+    if args.multiprocessing:
+        toolbox.register("map", futures.map)
+    else:
+        toolbox.register("map", map)
 
     # register desired evolution components
     process_config(config, toolbox)
@@ -72,7 +81,7 @@ def start_evolution(args, config):
     for i in range(args.num_iter+1):
 
         # test fitness of population
-        fitness = list(map(lambda p: toolbox.evaluate_fitness(p, env), population))
+        fitness = list(toolbox.map(lambda p: toolbox.evaluate_fitness(p, env), population))
         fit_evaluations += len(population)
 
         # assign fitness to corresponding individuals
@@ -107,9 +116,9 @@ def start_evolution(args, config):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Evolution Parameters.')
-    parser.add_argument('--num_iter', default=100,
+    parser.add_argument('--num_iter', default=100, type=int,
                         help='Number of iterations of the evolution (number of generated generations).')
-    parser.add_argument('--num_neurons',  default=10,
+    parser.add_argument('--num_neurons',  default=10, type=int,
                         help='Number of neurons used for the population.')
     parser.add_argument('--enemies', default=[2], nargs='+', type=int,
                         help='ID(s) of the enemy to specialize.')
@@ -125,10 +134,18 @@ if __name__ == "__main__":
                         help='Configuration file that specifies some parameters.')
     parser.add_argument('--seed', default=111, type=int,
                         help='Seed for numpy random functions.')
+    parser.add_argument('--multiprocessing', default=False, type=bool,
+                        help='Whether or not to use multiprocessing.')
+    parser.add_argument('--server', default=False, type=bool,
+                        help='Whether or not program is run on a UNIX server.')
     parser.add_argument('--representation', default="Neurons", type=str, choices=["Neurons"],
                         help='Type of problem representation.')
 
     args = parser.parse_args()
+
+    # set dummy video device if run on linux server
+    if args.server:
+        os.environ["SDL_VIDEODRIVER"] = "dummy"
 
     # set seed
     np.random.seed(args.seed)
@@ -137,4 +154,8 @@ if __name__ == "__main__":
     with open('configs/{}'.format(args.config)) as c:
         config = json.loads(c.read())
 
+    start_time = time()
     start_evolution(args, config)
+    end_time = time()
+    print("Finished {} generations with population size of {} in {} minutes".format(args.num_iter, args.pop_size,
+                                                                                    (end_time-start_time)/60))
