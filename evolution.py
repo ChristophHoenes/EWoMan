@@ -1,9 +1,10 @@
 # standard library imports
 import argparse
 import json
+import pickle
 import sys
 import os
-from time import time
+from time import time, strftime, gmtime
 
 # third party imports
 import numpy as np
@@ -45,6 +46,13 @@ def start_evolution(args, config):
         toolbox.register("map", futures.map)
     else:
         toolbox.register("map", map)
+
+    # create directory for experiment results
+    date_time = strftime("%d_%b_%Y_%H-%M-%S", gmtime())
+    save_dir = "{}_{}".format(args.config.split(".json")[0], date_time)
+    save_path = os.path.join(os.getcwd(), save_dir)
+    if not os.path.exists(save_path):
+        os.mkdir(save_path)
 
     # register desired evolution components
     process_config(config, toolbox)
@@ -112,6 +120,10 @@ def start_evolution(args, config):
         population = toolbox.select_survivors(population, **config["survive_args"])
         # next generation consists of the survivers of the previous and the offspring
         population = population + offspring
+
+        # save intermediate results
+        pickle.dump(population, open(os.path.join(save_path, "latest_population_iter_{}".format(i)), "wb"))
+        pickle.dump(logs, open(os.path.join(save_path, "logs_iter_{}".format(i)), "wb"))
 
 
 if __name__ == "__main__":
