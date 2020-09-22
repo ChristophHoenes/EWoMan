@@ -29,3 +29,15 @@ def deap_tournament_pairs(population, k=50, tournsize=3):
 
 def deap_tournament(population, k=3, tournsize=2):
     return tools.selTournament(population, k=k, tournsize=tournsize)
+
+
+def deap_roulette(population, k=50):
+    return tools.selRoulette(population, k)
+
+
+def deap_universal(population, k=50):
+    return tools.selStochasticUniversalSampling(population, k)
+
+
+def deap_best(population, k=3):
+    return tools.selBest(population, k)

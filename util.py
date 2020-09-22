@@ -25,6 +25,10 @@ def select_mating(fct_name):
         return average_parents
     elif fct_name == 'deap_xover_blend':
         return deap_xover_blend
+    elif fct_name == 'deap_xover_onepoint':
+        return deap_xover_onepoint
+    elif fct_name == 'deap_xover_uniform':
+        return deap_xover_uniform
     else:
         raise RuntimeError("Unknown type of mating function encountered! Please check your config.")
 
@@ -34,6 +38,10 @@ def select_mutation(fct_name):
         return gaussian_dummy_mutate
     elif fct_name == 'deap_mutate_shuffle':
         return deap_shuffle_mutation
+    elif fct_name == 'deap_mutate_gaussian':
+        return deap_gaussian_mutation
+    elif fct_name == 'deap_mutate_polynomial':
+        return deap_polynomialbounded_mutation
     else:
         raise RuntimeError("Unknown type of mutation function encountered! Please check your config.")
 
@@ -43,9 +51,15 @@ def select_selection(fct_name):
         return dummy_survivors
     elif fct_name == 'dummy_pairs':
         return select_k_strongest_pairs
+    elif fct_name == 'deap_best':
+        return deap_best
     elif fct_name == 'deap_tournament':
         return deap_tournament
     elif fct_name == 'deap_tournament_pairs':
         return deap_tournament_pairs
+    elif fct_name == 'deap_roulette':
+        return deap_roulette
+    elif fct_name == 'deap_universal':
+        return deap_universal
     else:
         raise RuntimeError("Unknown type of selection encountered! Please check your config.")
