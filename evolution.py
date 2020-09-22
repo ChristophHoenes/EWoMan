@@ -142,7 +142,7 @@ if __name__ == "__main__":
                         help='Who is hurt by contact with the opponent.')
     parser.add_argument('--pop_size', default=100, type=int,
                         help='Population size (initial number of individuals).')
-    parser.add_argument('--config', default="default_config.json", type=str,
+    parser.add_argument('--config', default="deap_base.json", type=str,
                         help='Configuration file that specifies some parameters.')
     parser.add_argument('--seed', default=111, type=int,
                         help='Seed for numpy random functions.')
