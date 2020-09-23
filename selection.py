@@ -37,8 +37,8 @@ def round_robin_tournament(population, k=100, tournsize=10):
     wins = np.zeros(len(population))
     for id, x in enumerate(population):
         for j in range(tournsize):
-            rival = random.choice(population)
-            if x.fitness.values[0] > rival.fitness.values[0]:
+            rival = np.random.choice(len(population))
+            if x.fitness.values[0] > population[rival].fitness.values[0]:
                 wins[id] += 1
     winner_idx = wins.argsort()[::-1][:k]
     survivors = [population[i] for i in winner_idx]
@@ -61,7 +61,7 @@ def diversity_round_robin_tournament(population, k=100, tournsize=10, alpha=0.5)
     for id, x in enumerate(population):
         score = (1 - alpha) * fitness_normalized[id] + alpha * diversity_normalized[id]
         for j in range(tournsize):
-            rival = random.choice(len(population))
+            rival = np.random.choice(len(population))
             rival_score = (1 - alpha) * fitness_normalized[rival] + alpha * diversity_normalized[rival]
             if score > rival_score:
                 wins[id] += 1
