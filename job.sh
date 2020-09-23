@@ -1,6 +1,6 @@
 #!/bin/bash
 #SBATCH -n 16
-#SBATCH -t 04:00:00
+#SBATCH -t 4:00:00
 
 #Loading modules
 #module load python
