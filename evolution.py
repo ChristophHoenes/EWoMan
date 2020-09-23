@@ -21,7 +21,7 @@ os.chdir('../')
 
 from util import process_config
 from representations import select_representation
-
+from diversity import diversity, diversity_gain
 
 def start_evolution(args, config):
 
@@ -37,8 +37,9 @@ def start_evolution(args, config):
     stats.register("std", np.std)
     stats.register("max", np.max)
     stats.register("min", np.min)
+    stats.register("diversity", diversity)
     logs = [tools.Logbook()]
-    logs[-1].header = "generation", "fit_evaluations", "mean", "std", "max", "min"
+    logs[-1].header = "generation", "fit_evaluations", "mean", "std", "max", "min", "diversity"
     fit_evaluations = 0
 
     # check multiprocessing
