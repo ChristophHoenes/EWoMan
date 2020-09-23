@@ -1,0 +1,18 @@
+certifi==2020.6.20
+cycler==0.10.0
+deap==1.3.1
+dill==0.3.2
+greenlet==0.4.16
+kiwisolver==1.2.0
+matplotlib==3.3.2
+mkl-fft==1.2.0
+mkl-random==1.1.1
+mkl-service==2.3.0
+numpy @ file:///tmp/build/80754af9/numpy_and_numpy_base_1596233737064/work
+Pillow==7.2.0
+pygame==1.9.6
+pyparsing==2.4.7
+python-dateutil==2.8.1
+pyzmq==19.0.2
+scoop==0.7.1.1
+six==1.15.0
