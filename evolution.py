@@ -101,7 +101,7 @@ def start_evolution(args, config):
         record = stats.compile(population)
         logs[-1].record(generation=i, fit_evaluations=fit_evaluations, **record)
         # print progress
-        print(logs[-1].stream)
+        print(logs[-1].stream, flush=True)
         # stop last iteration after evaluation of final population
         if i == args.num_iter:
             break
