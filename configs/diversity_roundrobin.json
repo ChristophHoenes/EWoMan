@@ -9,7 +9,7 @@
 
   "mate": "deap_xover_blend",
   "mate_args": {
-    "rate": 0.6
+    "rate": 0.5
   },
 
   "mutate_offspring": "deap_mutate_gaussian",
