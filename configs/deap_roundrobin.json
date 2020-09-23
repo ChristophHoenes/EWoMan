@@ -12,16 +12,18 @@
     "rate": 0.6
   },
 
-  "mutate_offspring": "deap_mutate_shuffle",
+  "mutate_offspring": "deap_mutate_gaussian",
   "mut_off_args": {
     "ind_prob": 0.2,
-    "mprob": 0.1
+    "mprob": 0.1,
+    "std": 0.3
   },
 
-  "mutate_parents": "deap_mutate_shuffle",
+  "mutate_parents": "deap_mutate_gaussian",
   "mut_pop_args": {
-    "ind_prob": 0.5,
-    "mprob": 0.2
+    "ind_prob": 0.3,
+    "mprob": 0.1,
+    "std": 0.3
   },
 
   "survive_select": "round_robin_tournament",
