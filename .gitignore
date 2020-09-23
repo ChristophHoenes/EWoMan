@@ -1,3 +1,5 @@
+#exclude job.sh
+job.sh
 # Evoman Framework
 evoman_framework/
 
