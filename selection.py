@@ -31,6 +31,7 @@ def deap_tournament_pairs(population, k=50, tournsize=3):
 def deap_tournament(population, k=3, tournsize=2):
     return tools.selTournament(population, k=k, tournsize=tournsize)
 
+
 def round_robin_tournament(population, k=100, tournsize=10):
     wins = np.zeros(len(population))
     for id, x in enumerate(population):
@@ -41,3 +42,16 @@ def round_robin_tournament(population, k=100, tournsize=10):
     winner_idx = wins.argsort()[::-1][:k]
     survivors = [population[i] for i in winner_idx]
     return survivors
+
+
+def deap_roulette(population, k=50):
+    return tools.selRoulette(population, k)
+
+
+def deap_universal(population, k=50):
+    return tools.selStochasticUniversalSampling(population, k)
+
+
+def deap_best(population, k=3):
+    return tools.selBest(population, k)
+
