@@ -146,6 +146,7 @@ def start_evolution(args, config):
     pickle.dump(population, open(os.path.join(save_path, "latest_population_iter_{}".format(i)), "wb"))
     pickle.dump(logs, open(os.path.join(save_path, "logs_iter_{}".format(i)), "wb"))
     pickle.dump(top5, open(os.path.join(save_path, "top5_iter_{}".format(i)), "wb"))
+    pickle.dump(config, open(os.path.join(save_path, "config"), "wb"))
 
 
 if __name__ == "__main__":
