@@ -69,7 +69,36 @@ def start_evolution(args, config):
     population = rep.create_population(args.pop_size)
 
     # loop through training iterations
-    for i in range(args.num_iter+1):
+    # test fitness of population
+    fitness = list(map(lambda p: toolbox.evaluate_fitness(p, env), population))
+    fit_evaluations += len(population)
+
+    # assign fitness to corresponding individuals
+    for ind, fit in zip(population, fitness):
+        ind.fitness.values = (fit,)
+
+    # record statistics and save intermediate results
+    top5.update(population)
+    record = stats.compile(population)
+    logs[-1].record(generation=0, fit_evaluations=fit_evaluations, **record)
+    # print progress
+    print(logs[-1].stream)
+
+
+    for i in range(1, args.num_iter+1):
+
+        # Evolution components
+        # mating selection
+        partners = toolbox.select_mating_partners(population, **config["mate_select_args"])
+        # mating mechanism (creating offspring from selection) and random mutation
+        # clone parents first
+        parent_clones = [tuple(toolbox.clone(ind) for ind in tup) for tup in partners]
+        offspring = toolbox.mate(parent_clones, **config["mate_args"])
+        # random mutations of existing individuals?? (optional)
+        population = toolbox.mutate_parents(population, **config["mut_pop_args"])
+        offspring = toolbox.mutate_offspring(offspring, **config["mut_off_args"])
+        # next generation consists of the survivers of the previous and the offspring
+        population = population + offspring
 
         # test fitness of population
         fitness = list(map(lambda p: toolbox.evaluate_fitness(p, env), population))
@@ -89,20 +118,8 @@ def start_evolution(args, config):
         if i == args.num_iter:
             break
 
-        # Evolution components
-        # mating selection
-        partners = toolbox.select_mating_partners(population, **config["mate_select_args"])
-        # mating mechanism (creating offspring from selection) and random mutation
-        # clone parents first
-        parent_clones = [tuple(toolbox.clone(ind) for ind in tup) for tup in partners]
-        offspring = toolbox.mate(parent_clones, **config["mate_args"])
-        # random mutations of existing individuals?? (optional)
-        population = toolbox.mutate_parents(population, **config["mut_pop_args"])
-        offspring = toolbox.mutate_offspring(offspring, **config["mut_off_args"])
         # survivor selection (define population of next iteration; which individuals are kept)
         population = toolbox.select_survivors(population, **config["survive_args"])
-        # next generation consists of the survivers of the previous and the offspring
-        population = population + offspring
 
 
 if __name__ == "__main__":

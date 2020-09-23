@@ -47,5 +47,7 @@ def select_selection(fct_name):
         return deap_tournament
     elif fct_name == 'deap_tournament_pairs':
         return deap_tournament_pairs
+    elif fct_name == 'round_robin_tournament':
+        return round_robin_tournament
     else:
         raise RuntimeError("Unknown type of selection encountered! Please check your config.")

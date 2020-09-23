@@ -1,5 +1,6 @@
 import numpy as np
 from deap import tools
+import random
 
 
 #def select_strongest_pairs(fitness, num_matings=5):
@@ -29,3 +30,14 @@ def deap_tournament_pairs(population, k=50, tournsize=3):
 
 def deap_tournament(population, k=3, tournsize=2):
     return tools.selTournament(population, k=k, tournsize=tournsize)
+
+def round_robin_tournament(population, k=100, tournsize=10):
+    wins = np.zeros(len(population))
+    for id, x in enumerate(population):
+        for j in range(tournsize):
+            rival = random.choice(population)
+            if x.fitness.values[0] > rival.fitness.values[0]:
+                wins[id] += 1
+    winner_idx = wins.argsort()[::-1][:k]
+    survivors = [population[i] for i in winner_idx]
+    return survivors
