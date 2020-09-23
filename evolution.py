@@ -84,6 +84,8 @@ def start_evolution(args, config):
 
     # create initial population
     population = rep.create_population(args.pop_size)
+    # save initial population
+    pickle.dump(population, open(os.path.join(save_path, "initial_population"), "wb"))
 
     # loop through training iterations
     for i in range(args.num_iter+1):
