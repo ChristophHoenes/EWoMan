@@ -167,6 +167,10 @@ if __name__ == "__main__":
     with open('configs/{}'.format(args.config)) as c:
         config = json.loads(c.read())
 
+    # print config
+    for key in config.keys():
+        print(key, ":", config[key])
+
     start_time = time()
     start_evolution(args, config)
     end_time = time()
