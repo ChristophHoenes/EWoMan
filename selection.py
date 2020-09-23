@@ -1,6 +1,7 @@
 import numpy as np
 from deap import tools
 import random
+from diversity import compute_centroids, diversity_gain
 
 
 #def select_strongest_pairs(fitness, num_matings=5):
@@ -38,6 +39,31 @@ def round_robin_tournament(population, k=100, tournsize=10):
         for j in range(tournsize):
             rival = random.choice(population)
             if x.fitness.values[0] > rival.fitness.values[0]:
+                wins[id] += 1
+    winner_idx = wins.argsort()[::-1][:k]
+    survivors = [population[i] for i in winner_idx]
+    return survivors
+
+
+def diversity_round_robin_tournament(population, k=100, tournsize=10, alpha=0.5):
+    centroids = compute_centroids(population)
+    diversity_gains = list(map(lambda p: diversity_gain(centroids, p), population))
+    min_div = min(diversity_gains)
+    diversity_range = max(diversity_gains) - min_div
+    diversity_normalized = [(d - min_div) / diversity_range for d in diversity_gains]
+
+    fitness = [ind.fitness.values[0] for ind in population]
+    min_fit = min(fitness)
+    fitness_range = max(fitness) - min_fit
+    fitness_normalized = [(f - min_fit) / fitness_range for f in fitness]
+
+    wins = np.zeros(len(population))
+    for id, x in enumerate(population):
+        score = (1 - alpha) * fitness_normalized[id] + alpha * diversity_normalized[id]
+        for j in range(tournsize):
+            rival = random.choice(len(population))
+            rival_score = (1 - alpha) * fitness_normalized[rival] + alpha * diversity_normalized[rival]
+            if score > rival_score:
                 wins[id] += 1
     winner_idx = wins.argsort()[::-1][:k]
     survivors = [population[i] for i in winner_idx]

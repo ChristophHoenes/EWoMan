@@ -69,6 +69,8 @@ def select_selection(fct_name):
         return deap_tournament_pairs
     elif fct_name == 'round_robin_tournament':
         return round_robin_tournament
+    elif fct_name == 'diversity_round_robin':
+        return diversity_round_robin_tournament
     elif fct_name == 'deap_roulette':
         return deap_roulette
     elif fct_name == 'deap_universal':
