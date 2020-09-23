@@ -129,6 +129,9 @@ def start_evolution(args, config):
         for ind, fit in zip(population, fitness):
             ind.fitness.values = (fit,)
 
+        # survivor selection (define population of next iteration; which individuals are kept)
+        population = toolbox.select_survivors(population, **config["survive_args"])
+
         # record statistics and save intermediate results
         top5.update(population)
         record = stats.compile(population)
@@ -138,9 +141,6 @@ def start_evolution(args, config):
         # stop last iteration after evaluation of final population
         if i == args.num_iter:
             break
-
-        # survivor selection (define population of next iteration; which individuals are kept)
-        population = toolbox.select_survivors(population, **config["survive_args"])
 
     # save results
     pickle.dump(population, open(os.path.join(save_path, "latest_population_iter_{}".format(i)), "wb"))
