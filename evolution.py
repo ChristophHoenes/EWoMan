@@ -1,9 +1,10 @@
 # standard library imports
 import argparse
 import json
+import pickle
 import sys
 import os
-from time import time
+from time import time, strftime, gmtime
 
 # third party imports
 import numpy as np
@@ -45,6 +46,13 @@ def start_evolution(args, config):
         toolbox.register("map", futures.map)
     else:
         toolbox.register("map", map)
+
+    # create directory for experiment results
+    date_time = strftime("%d_%b_%Y_%H-%M-%S", gmtime())
+    save_dir = "{}_{}".format(args.config.split(".json")[0], date_time)
+    save_path = os.path.join(os.getcwd(), save_dir)
+    if not os.path.exists(save_path):
+        os.mkdir(save_path)
 
     # register desired evolution components
     process_config(config, toolbox)
@@ -113,6 +121,11 @@ def start_evolution(args, config):
         # next generation consists of the survivers of the previous and the offspring
         population = population + offspring
 
+    # save results
+    pickle.dump(population, open(os.path.join(save_path, "latest_population_iter_{}".format(i)), "wb"))
+    pickle.dump(logs, open(os.path.join(save_path, "logs_iter_{}".format(i)), "wb"))
+    pickle.dump(top5, open(os.path.join(save_path, "top5_iter_{}".format(i)), "wb"))
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Evolution Parameters.')
@@ -130,7 +143,7 @@ if __name__ == "__main__":
                         help='Who is hurt by contact with the opponent.')
     parser.add_argument('--pop_size', default=100, type=int,
                         help='Population size (initial number of individuals).')
-    parser.add_argument('--config', default="default_config.json", type=str,
+    parser.add_argument('--config', default="deap_base.json", type=str,
                         help='Configuration file that specifies some parameters.')
     parser.add_argument('--seed', default=111, type=int,
                         help='Seed for numpy random functions.')
