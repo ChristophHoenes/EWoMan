@@ -85,7 +85,10 @@ def start_evolution(args, config):
     os.chdir('../')
 
     # create initial population
-    population = rep.create_population(args.pop_size)
+    if args.init_pop == 'random':
+        population = rep.create_population(args.pop_size)
+    else:
+        population = pickle.load(open(args.init_pop, "rb"))
     # save initial population
     pickle.dump(population, open(os.path.join(save_path, "initial_population"), "wb"))
 
@@ -104,7 +107,6 @@ def start_evolution(args, config):
     logs[-1].record(generation=0, fit_evaluations=fit_evaluations, **record)
     # print progress
     print(logs[-1].stream)
-
 
     for i in range(1, args.num_iter+1):
 
@@ -171,8 +173,10 @@ if __name__ == "__main__":
                         help='Population size (initial number of individuals).')
     parser.add_argument('--config', default="deap_base.json", type=str,
                         help='Configuration file that specifies some parameters.')
-    parser.add_argument('--seed', default=111, type=int,
+    parser.add_argument('--seed', default=None, type=int,
                         help='Seed for numpy random functions.')
+    parser.add_argument('--init_pop', default='random', type=str,
+                        help='Path to initial population file (default: random initialization).')
     parser.add_argument('--multiprocessing', default=False, type=bool,
                         help='Whether or not to use multiprocessing.')
     parser.add_argument('--server', default=False, type=bool,
@@ -187,7 +191,8 @@ if __name__ == "__main__":
         os.environ["SDL_VIDEODRIVER"] = "dummy"
 
     # set seed
-    np.random.seed(args.seed)
+    if args.seed is not None:
+        np.random.seed(args.seed)
 
     # load config from file
     with open('configs/{}'.format(args.config)) as c:

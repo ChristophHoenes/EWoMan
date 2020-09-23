@@ -1,7 +1,17 @@
+from matplotlib import pyplot as plt
 from fitness import *
 from mating import *
 from mutation import *
 from selection import *
+
+
+def plot_diversity(logs, savepath=''):
+    diversities = [step['diversity'] for step in logs[0]]
+    plt.plot(range(len(diversities)), diversities)
+    if savepath == '':
+        plt.show()
+    else:
+        plt.savefig(savepath)
 
 
 def process_config(config, toolbox):
