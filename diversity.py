@@ -7,10 +7,11 @@ def diversity(population):
     return sum([np.square(ind-centroids).sum() for ind in pop])
 
 
-# calculate gains like
-#gainz = list(map(lambda p: diversity_gain(offspring, p), population))
-def diversity_gain(population, individual):
+def compute_centroids(population):
     pop = np.asarray(population)
+    return pop.mean(axis=0)
+
+
+def diversity_gain(centroids, individual):
     ind = np.asarray(individual)
-    centroids = pop.mean(axis=0)
     return np.square(ind - centroids).sum()
