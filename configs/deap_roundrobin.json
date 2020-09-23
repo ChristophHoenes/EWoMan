@@ -4,7 +4,7 @@
   "mate_select": "deap_tournament_pairs",
   "mate_select_args": {
     "k": 100,
-    "tournsize": 3
+    "tournsize": 7
   },
 
   "mate": "deap_xover_blend",
