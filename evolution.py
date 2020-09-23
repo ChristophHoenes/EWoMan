@@ -85,7 +85,10 @@ def start_evolution(args, config):
     os.chdir('../')
 
     # create initial population
-    population = rep.create_population(args.pop_size)
+    if args.init_pop == 'random':
+        population = rep.create_population(args.pop_size)
+    else:
+        population = pickle.load(open(args.init_pop, "rb"))
     # save initial population
     pickle.dump(population, open(os.path.join(save_path, "initial_population"), "wb"))
 
@@ -105,29 +108,35 @@ def start_evolution(args, config):
     # print progress
     print(logs[-1].stream)
 
-
     for i in range(1, args.num_iter+1):
 
         # Evolution components
+
         # mating selection
         partners = toolbox.select_mating_partners(population, **config["mate_select_args"])
+
         # mating mechanism (creating offspring from selection) and random mutation
         # clone parents first
         parent_clones = [tuple(toolbox.clone(ind) for ind in tup) for tup in partners]
         offspring = toolbox.mate(parent_clones, **config["mate_args"])
-        # random mutations of existing individuals?? (optional)
-        population = toolbox.mutate_parents(population, **config["mut_pop_args"])
-        offspring = toolbox.mutate_offspring(offspring, **config["mut_off_args"])
-        # next generation consists of the survivers of the previous and the offspring
-        population = population + offspring
 
-        # test fitness of population
-        fitness = list(toolbox.map(lambda p: toolbox.evaluate_fitness(p, env), population))
-        fit_evaluations += len(population)
+        # mutation of parent generation (optional)
+        # population = toolbox.mutate_parents(population, **config["mut_pop_args"])
+        # random mutations of offspring
+        offspring = toolbox.mutate_offspring(offspring, **config["mut_off_args"])
+
+        # test fitness of offspring
+        fitness = list(toolbox.map(lambda p: toolbox.evaluate_fitness(p, env), offspring))
+        fit_evaluations += len(offspring)
 
         # assign fitness to corresponding individuals
-        for ind, fit in zip(population, fitness):
+        for ind, fit in zip(offspring, fitness):
             ind.fitness.values = (fit,)
+
+        # next generation consists of the survivors of the previous and the offspring
+        population = population + offspring
+        # survivor selection (define population of next iteration; which individuals are kept)
+        population = toolbox.select_survivors(population, **config["survive_args"])
 
         # record statistics and save intermediate results
         top5.update(population)
@@ -139,13 +148,12 @@ def start_evolution(args, config):
         if i == args.num_iter:
             break
 
-        # survivor selection (define population of next iteration; which individuals are kept)
-        population = toolbox.select_survivors(population, **config["survive_args"])
-
     # save results
     pickle.dump(population, open(os.path.join(save_path, "latest_population_iter_{}".format(i)), "wb"))
     pickle.dump(logs, open(os.path.join(save_path, "logs_iter_{}".format(i)), "wb"))
     pickle.dump(top5, open(os.path.join(save_path, "top5_iter_{}".format(i)), "wb"))
+    pickle.dump(config, open(os.path.join(save_path, "config"), "wb"))
+    pickle.dump(args, open(os.path.join(save_path, "args"), "wb"))
 
 
 if __name__ == "__main__":
@@ -166,8 +174,10 @@ if __name__ == "__main__":
                         help='Population size (initial number of individuals).')
     parser.add_argument('--config', default="deap_base.json", type=str,
                         help='Configuration file that specifies some parameters.')
-    parser.add_argument('--seed', default=111, type=int,
+    parser.add_argument('--seed', default=None, type=int,
                         help='Seed for numpy random functions.')
+    parser.add_argument('--init_pop', default='random', type=str,
+                        help='Path to initial population file (default: random initialization).')
     parser.add_argument('--multiprocessing', default=False, type=bool,
                         help='Whether or not to use multiprocessing.')
     parser.add_argument('--server', default=False, type=bool,
@@ -182,7 +192,8 @@ if __name__ == "__main__":
         os.environ["SDL_VIDEODRIVER"] = "dummy"
 
     # set seed
-    np.random.seed(args.seed)
+    if args.seed is not None:
+        np.random.seed(args.seed)
 
     # load config from file
     with open('configs/{}'.format(args.config)) as c:
