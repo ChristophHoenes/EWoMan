@@ -1,7 +1,6 @@
 import pickle
 import numpy as np
 from matplotlib import pyplot as plt
-from util import plot_diversity
 
 
 def plot_stat_mean(stat_key='mean', methods=['method_1', 'method2'], enemy=2, seeds=None, prefix=None, fancy=False, savepath=''):
