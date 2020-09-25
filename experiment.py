@@ -40,6 +40,7 @@ def get_best_individuals(enemy=2):
 
     return top_individuals
 
+
 if __name__ == "__main__":
 
     enemies = [2,6,7]
@@ -73,7 +74,7 @@ if __name__ == "__main__":
                 ind_results = []
                 for iter in range(5):
                     os.chdir('./evoman_framework')
-                    fit, e_e, e_p, t = env.play(pcont=np.asarray(individual))
+                    fit, e_p, e_e, t = env.play(pcont=np.asarray(individual))
                     os.chdir('../')
                     ind_results.append(e_p-e_e)
                 results[method].append(mean(ind_results))
