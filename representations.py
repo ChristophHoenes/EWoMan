@@ -6,7 +6,6 @@ from abc import ABC, abstractmethod
 
 from deap import creator, base, tools, algorithms
 
-sys.path.insert(0, './evoman_framework')
 from demo_controller import player_controller
 
 
@@ -51,6 +50,4 @@ class NeuronRep(Representation):
         return player_controller(self.config['num_neurons'])
 
     def create_population(self, population_size):
-        # TODO maybe change to uniform distribution
-        # TODO check number of parameters/neurons
         return self.toolbox.population(n=population_size)

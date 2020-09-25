@@ -12,13 +12,8 @@ from deap import creator, base, tools, algorithms
 from scoop import futures
 
 # local imports
-# change directory and add evoman to path to be able to load framework without errors
-os.chdir('./evoman_framework')
 sys.path.insert(0, 'evoman')
 from environment import Environment
-# change working directory back to root
-os.chdir('../')
-
 from util import process_config
 from representations import select_representation
 from diversity import diversity, diversity_gain
@@ -64,8 +59,6 @@ def start_evolution(args, config):
     controller = rep.get_controller()
 
     #create folder for experiment
-    # TODO "overthink" folder structure to resolve directory changes
-    os.chdir('./evoman_framework')
     exp_name = "specialist_{}".format(args.enemies)
     if not os.path.exists(exp_name):
         os.mkdir(exp_name)
@@ -81,7 +74,6 @@ def start_evolution(args, config):
                       randomini=args.random_loc,
                       contacthurt=args.contacthurt,
                       sound="off")
-    os.chdir('../')
 
     # create initial population
     if args.init_pop == 'random':
@@ -171,7 +163,7 @@ if __name__ == "__main__":
                         help='Who is hurt by contact with the opponent.')
     parser.add_argument('--pop_size', default=100, type=int,
                         help='Population size (initial number of individuals).')
-    parser.add_argument('--config', default="deap_base.json", type=str,
+    parser.add_argument('--config', default="deap_roundrobin.json", type=str,
                         help='Configuration file that specifies some parameters.')
     parser.add_argument('--seed', default=None, type=int,
                         help='Seed for numpy random functions.')

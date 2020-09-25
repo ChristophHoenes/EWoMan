@@ -26,7 +26,6 @@ def plot_stat_mean(stat_key='mean', methods=['method_1', 'method2'], enemy=2, se
             plt.fill_between(np.arange(len(mean)), mean-std, mean+std, alpha=.25)
         else:
             plt.errorbar(np.arange(len(mean)), mean, std, linestyle='-', marker='o')
-    #plt.plot(range(len(mean)), mean, '-o')
     if savepath == '':
         plt.show()
     else:
@@ -47,4 +46,4 @@ if __name__ == "__main__":
     #logs = pickle.load(open(log_path, "rb"))
     #plot_stat(logs, stat_key='max')
     plot_stat_mean(stat_key='diversity', enemy=7, fancy=True)
-    #plot_diversity(logs)
+

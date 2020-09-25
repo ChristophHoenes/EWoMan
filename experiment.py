@@ -4,15 +4,12 @@ import csv
 import datetime
 from statistics import mean
 import pickle
-from deap import creator, base
 from collections import defaultdict
 
-os.chdir('./evoman_framework')
+from deap import creator, base
+
 sys.path.insert(0, 'evoman')
 from environment import Environment
-# change working directory back to root
-os.chdir('../')
-sys.path.insert(0, './evoman_framework')
 from demo_controller import player_controller
 
 
@@ -25,7 +22,6 @@ def get_best_individuals(enemy=2):
     seeds = [111, 222, 333, 444, 555, 666, 777, 888, 999, 1010]
     methods = ["method_1", "method2", "method3"]
     for method in methods:
-        top_individuals_bymethod = []
         if method == 'method_1':
             prefix = 'roundrobin'
         elif method == 'method2':
@@ -48,7 +44,6 @@ if __name__ == "__main__":
     enemy_results = {}
 
     for en in enemies:
-        os.chdir('./evoman_framework')
 
         experiment_name = 'experiment'
         if not os.path.exists(experiment_name):
@@ -64,7 +59,6 @@ if __name__ == "__main__":
                           randomini="no",
                           contacthurt="player",
                           sound="off")
-        os.chdir('../')
 
         top_individuals = get_best_individuals(enemy=en)
         results = defaultdict(list)
@@ -82,5 +76,3 @@ if __name__ == "__main__":
         enemy_results[en] = results
 
     pickle.dump(enemy_results, open("best_ind_results", "wb"))
-
-
