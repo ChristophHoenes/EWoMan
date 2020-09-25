@@ -44,8 +44,7 @@ if __name__ == "__main__":
 
     enemies = [2,6,7]
     num_neurons = 10
-    results = []
-    count = 0
+    enemy_results = {}
 
     for en in enemies:
         os.chdir('./evoman_framework')
@@ -67,8 +66,8 @@ if __name__ == "__main__":
         os.chdir('../')
 
         top_individuals = get_best_individuals(enemy=en)
-
-        methods = ["method_1", "method2", "method3"]
+        results = defaultdict(list)
+        methods = ["method_1", "method3"]
         for method in methods:
             for individual in top_individuals[method]:
                 ind_results = []
@@ -77,13 +76,10 @@ if __name__ == "__main__":
                     fit, e_e, e_p, t = env.play(pcont=np.asarray(individual))
                     os.chdir('../')
                     ind_results.append(e_p-e_e)
-                results.append(mean(ind_results))
+                results[method].append(mean(ind_results))
 
-                print("Count "+str(count))
+        enemy_results[en] = results
 
-            with open('experiment_results.csv', 'a') as f:
-                write = csv.writer(f)
-                f.write(str(en))
-                for individual in results:
-                    f.write(str(individual))
+    pickle.dump(enemy_results, open("best_ind_results", "wb"))
+
 
