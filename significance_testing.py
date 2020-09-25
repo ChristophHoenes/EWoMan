@@ -3,7 +3,7 @@ import pickle
 from scipy import stats
 
 
-def t_test(data, methods=['method_1', 'method3'], threshold=0.05):
+def t_test(data, methods=['method_1', 'method3'], threshold=0.1):
     for enemy in data.keys():
         pop_1 = np.asarray(data[enemy][methods[0]])
         pop_2 = np.asarray(data[enemy][methods[1]])
